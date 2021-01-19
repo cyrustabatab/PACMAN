@@ -26,6 +26,10 @@ class Game:
                 self.menu_events()
                 self.menu_update()
                 self.menu_draw()
+            elif self.state == 'playing':
+                self.game_events()
+                self.game_update()
+                self.game_draw()
             
 
             
@@ -37,15 +41,31 @@ class Game:
         sys.exit()
  
     
-    def draw_text(self,text,screen,position,size,color,font_name):
+    def draw_text(self,text,screen,position,size,color,font_name,centered=False):
         font = pygame.font.SysFont(font_name,size)
         text_surface = font.render(text,False,color)
         text_width,text_height = text_surface.get_size()
-        position[0] = position[0] - text_width//2
-        position[1] = position[1] - text_height//2
+        if centered:
+            position[0] = position[0] - text_width//2
+            position[1] = position[1] - text_height//2
         screen.blit(text_surface,position)
 
+    
 
+    def game_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+
+
+
+    def game_update(self):
+        pass
+
+
+    def game_draw(self):
+        self.screen.fill(RED)
+        pygame.display.update()
 ############################## INTRO FUNCTIONS #############################
 
     def menu_events(self):
@@ -65,5 +85,10 @@ class Game:
     def menu_draw(self):
         self.screen.fill(BLACK)
         start_text  = "PUSH SPACE BAR"
-        self.draw_text(start_text,self.screen,[WIDTH//2,HEIGHT//2],MENU_TEXT_SIZE,PUSH_SPACE_BAR_COLOR,MENU_FONT)
+        self.draw_text(start_text,self.screen,[WIDTH//2,HEIGHT//2 - 50],MENU_TEXT_SIZE,PUSH_SPACE_BAR_COLOR,MENU_FONT,centered=True)
+        one_player_text = "1 PLAYER ONLY"
+        self.draw_text(one_player_text,self.screen,[WIDTH//2,HEIGHT//2 + 50],MENU_TEXT_SIZE,(33,137,156),MENU_FONT,centered=True)
+        high_score_text = "HIGH SCORE"
+        self.draw_text(high_score_text,self.screen,[4,0],MENU_TEXT_SIZE,WHITE,MENU_FONT)
+
         pygame.display.update()
