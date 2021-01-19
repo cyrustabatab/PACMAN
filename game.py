@@ -13,9 +13,17 @@ class Game:
 
     def __init__(self):
         self.screen = pygame.display.set_mode((WIDTH,HEIGHT))
+        pygame.display.set_caption('PACMAN')
         self.clock = pygame.time.Clock()
         self.running = True
         self.state = 'menu' #keep track of what state game is in
+        self.cell_width= MAZE_WIDTH//28
+        self.cell_height = MAZE_HEIGHT//30
+        self.load()
+    
+
+
+
 
 
     def run(self):
@@ -39,7 +47,22 @@ class Game:
         
         pygame.quit()
         sys.exit()
- 
+    
+
+    def draw_grid(self):
+        
+            
+        columns= WIDTH//self.cell_width
+        for col in range(columns):
+            pygame.draw.line(self.background,GRAY,(col * self.cell_width,0),(col*self.cell_width,HEIGHT))
+    
+
+        rows = HEIGHT // self.cell_height
+        for row in range(rows):
+            pygame.draw.line(self.background,GRAY,(0,row * self.cell_height),(WIDTH,row * self.cell_height))
+
+
+
     
     def draw_text(self,text,screen,position,size,color,font_name,centered=False):
         font = pygame.font.SysFont(font_name,size)
@@ -49,7 +72,11 @@ class Game:
             position[0] = position[0] - text_width//2
             position[1] = position[1] - text_height//2
         screen.blit(text_surface,position)
+    
 
+    def load(self):
+        self.background = pygame.image.load('maze.png')
+        self.background = pygame.transform.scale(self.background,(MAZE_WIDTH,MAZE_HEIGHT))
     
 
     def game_events(self):
@@ -64,7 +91,12 @@ class Game:
 
 
     def game_draw(self):
-        self.screen.fill(RED)
+        self.screen.fill(BLACK)
+        topleft=(0,0)
+        self.screen.blit(self.background,(TOP_BOTTOM_GAP//2,TOP_BOTTOM_GAP//2))
+        self.draw_grid()
+        self.draw_text(f"CURRENT SCORE: 0",self.screen,(60,1),18,WHITE,MENU_FONT)
+        self.draw_text(f"HIGH SCORE: 0",self.screen,(WIDTH//2 + 60,1),18,WHITE,MENU_FONT)
         pygame.display.update()
 ############################## INTRO FUNCTIONS #############################
 
