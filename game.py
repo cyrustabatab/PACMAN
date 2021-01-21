@@ -1,5 +1,6 @@
 import pygame,sys
 from settings import *
+from player import Player
 
 
 pygame.init()
@@ -19,6 +20,8 @@ class Game:
         self.state = 'menu' #keep track of what state game is in
         self.cell_width= MAZE_WIDTH//28
         self.cell_height = MAZE_HEIGHT//30
+        print(self.cell_width,self.cell_height)
+        self.player = Player(self,PLAYER_START)
         self.load()
     
 
@@ -84,10 +87,23 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    self.player.move(vec(-1,0))
+                if event.key == pygame.K_RIGHT:
+                    self.player.move(vec(1,0))
+                if event.key == pygame.K_UP:
+                    self.player.move(vec(0,-1))
+                if event.key == pygame.K_DOWN:
+                    self.player.move(vec(0,1))
+
+
+
+
 
 
     def game_update(self):
-        pass
+        self.player.update()
 
 
     def game_draw(self):
@@ -97,6 +113,7 @@ class Game:
         self.draw_grid()
         self.draw_text(f"CURRENT SCORE: 0",self.screen,(60,1),18,WHITE,MENU_FONT)
         self.draw_text(f"HIGH SCORE: 0",self.screen,(WIDTH//2 + 60,1),18,WHITE,MENU_FONT)
+        self.player.draw()
         pygame.display.update()
 ############################## INTRO FUNCTIONS #############################
 
