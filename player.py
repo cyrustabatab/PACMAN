@@ -11,6 +11,7 @@ class Player:
         self.pix_pos = self.get_pixel_position()
         self.direction = vec(1,0)
         self.stored_direction = None
+        self.able_to_move = True
     
 
 
@@ -19,17 +20,15 @@ class Player:
 
     def update(self):
 
-        self.pix_pos += self.direction
-        if self.stored_direction is not None:
-            if int(self.pix_pos.x - self.game.cell_width//2 - 5) % self.game.cell_width == 0:
-                if self.direction == vec(1,0) or self.direction == vec(-1,0):
-                    self.direction = self.stored_direction
-                    self.stored_direction = None
-        if self.stored_direction is not None:
-            if int(self.pix_pos.y - self.game.cell_height//2 - 5) % self.game.cell_height == 0:
-                if self.direction == vec(0,1) or self.direction == vec(0,-1):
-                    self.direction = self.stored_direction
-                    self.stored_direction = None
+        if self.able_to_move:
+            self.pix_pos += self.direction
+
+        if self.time_to_move():
+            if self.stored_direction:
+                self.direction = self.stored_direction
+                self.stored_direction = None
+            self.able_to_move = self.can_move()
+        
         self.grid_pos = (self.pix_pos.x-TOP_BOTTOM_GAP//2)//self.game.cell_width,(self.pix_pos.y - TOP_BOTTOM_GAP)//self.game.cell_height + 1
 
     def draw(self):
@@ -39,5 +38,23 @@ class Player:
 
     def move(self,direction):
         self.stored_direction = direction
+    
+
+
+    def time_to_move(self):
+        if int(self.pix_pos.x - self.game.cell_width//2 - 5) % self.game.cell_width == 0:
+            if self.direction == vec(1,0) or self.direction == vec(-1,0):
+                return True
+        if int(self.pix_pos.y - self.game.cell_height//2 - 5) % self.game.cell_height == 0:
+            if self.direction == vec(0,1) or self.direction == vec(0,-1):
+                return True
+    
+    def can_move(self):
+        for wall in self.game.walls:
+            if self.grid_pos + self.direction == wall:
+                return False
+
+        return True
+
 
 

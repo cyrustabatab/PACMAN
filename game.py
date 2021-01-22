@@ -22,6 +22,7 @@ class Game:
         self.cell_height = MAZE_HEIGHT//30
         print(self.cell_width,self.cell_height)
         self.player = Player(self,PLAYER_START)
+        self.walls = []
         self.load()
     
 
@@ -64,7 +65,9 @@ class Game:
         for row in range(rows):
             pygame.draw.line(self.background,GRAY,(0,row * self.cell_height),(WIDTH,row * self.cell_height))
 
-
+        
+        for wall in self.walls:
+            pygame.draw.rect(self.background,(112,55,163),(wall.x * self.cell_width,wall.y * self.cell_height,self.cell_width,self.cell_height))
 
     
     def draw_text(self,text,screen,position,size,color,font_name,centered=False):
@@ -80,6 +83,13 @@ class Game:
     def load(self):
         self.background = pygame.image.load('maze.png')
         self.background = pygame.transform.scale(self.background,(MAZE_WIDTH,MAZE_HEIGHT))
+        with open('walls.txt','r') as f:
+            for y,line in enumerate(f):
+                for x,character in enumerate(line):
+                    if character == '1':
+                        self.walls.append(vec(x,y))
+
+
     
 
     def game_events(self):
