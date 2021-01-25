@@ -23,6 +23,7 @@ class Game:
         print(self.cell_width,self.cell_height)
         self.player = Player(self,PLAYER_START)
         self.walls = []
+        self.coins = []
         self.load()
     
 
@@ -64,10 +65,14 @@ class Game:
         rows = HEIGHT // self.cell_height
         for row in range(rows):
             pygame.draw.line(self.background,GRAY,(0,row * self.cell_height),(WIDTH,row * self.cell_height))
-
         
+
+
+
+        ''' 
         for wall in self.walls:
             pygame.draw.rect(self.background,(112,55,163),(wall.x * self.cell_width,wall.y * self.cell_height,self.cell_width,self.cell_height))
+        '''
 
     
     def draw_text(self,text,screen,position,size,color,font_name,centered=False):
@@ -88,6 +93,8 @@ class Game:
                 for x,character in enumerate(line):
                     if character == '1':
                         self.walls.append(vec(x,y))
+                    elif character == 'C':
+                        self.coins.append(vec(x,y))
 
 
     
@@ -118,13 +125,15 @@ class Game:
 
     def game_draw(self):
         self.screen.fill(BLACK)
-        topleft=(0,0)
         self.screen.blit(self.background,(TOP_BOTTOM_GAP//2,TOP_BOTTOM_GAP//2))
+        self.draw_coins()
         self.draw_grid()
+        topleft=(0,0)
         self.draw_text(f"CURRENT SCORE: 0",self.screen,(60,1),18,WHITE,MENU_FONT)
         self.draw_text(f"HIGH SCORE: 0",self.screen,(WIDTH//2 + 60,1),18,WHITE,MENU_FONT)
         self.player.draw()
         pygame.display.update()
+        self.coins.pop()
 ############################## INTRO FUNCTIONS #############################
 
     def menu_events(self):
@@ -151,3 +160,9 @@ class Game:
         self.draw_text(high_score_text,self.screen,[4,0],MENU_TEXT_SIZE,WHITE,MENU_FONT)
 
         pygame.display.update()
+
+
+
+    def draw_coins(self):
+        for coin in self.coins:
+            pygame.draw.circle(self.screen,(124,123,7),(coin.x * self.cell_width + self.cell_width//2 + TOP_BOTTOM_GAP//2,coin.y * self.cell_height + self.cell_height//2 + TOP_BOTTOM_GAP//2),5)
