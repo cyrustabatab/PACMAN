@@ -21,10 +21,10 @@ class Game:
         self.cell_width= MAZE_WIDTH//28
         self.cell_height = MAZE_HEIGHT//30
         print(self.cell_width,self.cell_height)
-        self.player = Player(self,PLAYER_START)
         self.walls = []
         self.coins = []
         self.load()
+        self.player = Player(self,self.player_position)
     
 
 
@@ -95,6 +95,9 @@ class Game:
                         self.walls.append(vec(x,y))
                     elif character == 'C':
                         self.coins.append(vec(x,y))
+                    elif character == 'P':
+                        self.player_position = vec(x,y)
+
 
 
     
@@ -129,11 +132,11 @@ class Game:
         self.draw_coins()
         self.draw_grid()
         topleft=(0,0)
-        self.draw_text(f"CURRENT SCORE: 0",self.screen,(60,1),18,WHITE,MENU_FONT)
+        self.draw_text(f"CURRENT SCORE: {self.player.score}",self.screen,(60,1),18,WHITE,MENU_FONT)
         self.draw_text(f"HIGH SCORE: 0",self.screen,(WIDTH//2 + 60,1),18,WHITE,MENU_FONT)
         self.player.draw()
         pygame.display.update()
-        self.coins.pop()
+
 ############################## INTRO FUNCTIONS #############################
 
     def menu_events(self):
