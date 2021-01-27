@@ -1,6 +1,7 @@
 import pygame,sys
 from settings import *
 from player import Player
+from enemy import Enemy
 
 
 pygame.init()
@@ -23,8 +24,11 @@ class Game:
         print(self.cell_width,self.cell_height)
         self.walls = []
         self.coins = []
+        self.enemies = []
+        self.enemy_positions = []
         self.load()
         self.player = Player(self,self.player_position)
+        self.make_enemies()
     
 
 
@@ -97,8 +101,16 @@ class Game:
                         self.coins.append(vec(x,y))
                     elif character == 'P':
                         self.player_position = vec(x,y)
+                    elif character in ('2','3','4','5'):
+                        self.enemy_positions.append(vec(x,y))
 
 
+
+
+    def make_enemies(self):
+
+        for enemy_position in self.enemy_positions:
+            self.enemies.append(Enemy(self,enemy_position))
 
     
 
@@ -124,6 +136,8 @@ class Game:
 
     def game_update(self):
         self.player.update()
+        for enemy in self.enemies:
+            enemy.update()
 
 
     def game_draw(self):
@@ -135,6 +149,9 @@ class Game:
         self.draw_text(f"CURRENT SCORE: {self.player.score}",self.screen,(60,1),18,WHITE,MENU_FONT)
         self.draw_text(f"HIGH SCORE: 0",self.screen,(WIDTH//2 + 60,1),18,WHITE,MENU_FONT)
         self.player.draw()
+        for enemy in self.enemies:
+            enemy.draw()
+
         pygame.display.update()
 
 ############################## INTRO FUNCTIONS #############################
