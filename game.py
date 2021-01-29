@@ -103,14 +103,16 @@ class Game:
                         self.player_position = vec(x,y)
                     elif character in ('2','3','4','5'):
                         self.enemy_positions.append(vec(x,y))
+                    elif character == 'B':
+                        pygame.draw.rect(self.background,BLACK,(x * self.cell_width,y * self.cell_height,self.cell_width,self.cell_height))
 
 
 
 
     def make_enemies(self):
 
-        for enemy_position in self.enemy_positions:
-            self.enemies.append(Enemy(self,enemy_position))
+        for i,enemy_position in enumerate(self.enemy_positions):
+            self.enemies.append(Enemy(self,enemy_position,i))
 
     
 
