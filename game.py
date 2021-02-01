@@ -18,6 +18,7 @@ class Game:
         pygame.display.set_caption('PACMAN')
         self.clock = pygame.time.Clock()
         self.running = True
+        self.new_high_score  = False
         self.state = 'menu' #keep track of what state game is in
         self.cell_width= MAZE_WIDTH//28
         self.cell_height = MAZE_HEIGHT//30
@@ -91,6 +92,7 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     self.state = 'playing'
+                    self.new_high_score = False
 
 
 
@@ -103,6 +105,8 @@ class Game:
     def game_over_draw(self):
         self.screen.fill(BLACK)
         self.draw_text(f"GAME OVER",self.screen,[WIDTH//2,HEIGHT//2],18,RED,MENU_FONT,centered=True)
+        if self.new_high_score:
+            self.draw_text(f"NEW HIGH SCORE: {self.high_score}",self.screen,[WIDTH//2,HEIGHT//2 + 50],18,RED,MENU_FONT,centered=True)
         pygame.display.update()
 
 
@@ -121,6 +125,10 @@ class Game:
     
 
     def load(self):
+
+        with open('high_score.txt','r') as f:
+            self.high_score = int(f.read())
+
         self.background = pygame.image.load('maze.png')
         self.background = pygame.transform.scale(self.background,(MAZE_WIDTH,MAZE_HEIGHT))
         with open('walls.txt','r') as f:
@@ -184,7 +192,7 @@ class Game:
         self.draw_grid()
         topleft=(0,0)
         self.draw_text(f"CURRENT SCORE: {self.player.score}",self.screen,(60,1),18,WHITE,MENU_FONT)
-        self.draw_text(f"HIGH SCORE: 0",self.screen,(WIDTH//2 + 60,1),18,WHITE,MENU_FONT)
+        self.draw_text(f"HIGH SCORE: {self.high_score}",self.screen,(WIDTH//2 + 60,1),18,WHITE,MENU_FONT)
         self.player.draw()
         for enemy in self.enemies:
             enemy.draw()
@@ -222,6 +230,11 @@ class Game:
     def remove_life(self):
         self.player.lives -= 1
         if self.player.lives == 0:
+            if self.player.score > self.high_score:
+                self.new_high_score = True
+                self.high_score = self.player.score
+                with open('high_score.txt','w') as f:
+                    f.write(str(self.high_score))
             self.state = 'game over'
             self.player.score = 0
 
