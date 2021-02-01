@@ -21,7 +21,6 @@ class Game:
         self.state = 'menu' #keep track of what state game is in
         self.cell_width= MAZE_WIDTH//28
         self.cell_height = MAZE_HEIGHT//30
-        print(self.cell_width,self.cell_height)
         self.walls = []
         self.coins = []
         self.enemies = []
@@ -47,6 +46,11 @@ class Game:
                 self.game_events()
                 self.game_update()
                 self.game_draw()
+            elif self.state == 'game over':
+                self.game_over_events()
+                self.game_over_update()
+                self.game_over_draw()
+
             
 
             
@@ -77,6 +81,33 @@ class Game:
         for wall in self.walls:
             pygame.draw.rect(self.background,(112,55,163),(wall.x * self.cell_width,wall.y * self.cell_height,self.cell_width,self.cell_height))
         '''
+    
+
+    def game_over_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    self.state = 'playing'
+
+
+
+    
+
+    def game_over_update(self):
+        pass
+
+
+    def game_over_draw(self):
+        self.screen.fill(BLACK)
+        self.draw_text(f"GAME OVER",self.screen,[WIDTH//2,HEIGHT//2],18,RED,MENU_FONT,centered=True)
+        pygame.display.update()
+
+
+
+
 
     
     def draw_text(self,text,screen,position,size,color,font_name,centered=False):
@@ -100,9 +131,9 @@ class Game:
                     elif character == 'C':
                         self.coins.append(vec(x,y))
                     elif character == 'P':
-                        self.player_position = vec(x,y)
+                        self.player_position = (x,y)#vec(x,y)
                     elif character in ('2','3','4','5'):
-                        self.enemy_positions.append(vec(x,y))
+                        self.enemy_positions.append((x,y))
                     elif character == 'B':
                         pygame.draw.rect(self.background,BLACK,(x * self.cell_width,y * self.cell_height,self.cell_width,self.cell_height))
 
@@ -140,6 +171,10 @@ class Game:
         self.player.update()
         for enemy in self.enemies:
             enemy.update()
+            if enemy.grid_pos == self.player.grid_pos:
+                self.remove_life()
+
+        
 
 
     def game_draw(self):
@@ -183,7 +218,16 @@ class Game:
 
         pygame.display.update()
 
+    
+    def remove_life(self):
+        self.player.lives -= 1
+        if self.player.lives == 0:
+            self.state = 'game over'
+            self.player.score = 0
 
+        self.player.reset()
+        for enemy in self.enemies:
+            enemy.reset()
 
     def draw_coins(self):
         for coin in self.coins:

@@ -10,7 +10,8 @@ class Enemy:
 
     def __init__(self,game,pos,number):
         self.game = game
-        self.grid_pos = pos
+        self.initial_position = pos
+        self.grid_pos = vec(*pos)
         self.pixel_pos = self.get_pixel_position()
         self.radius = self.game.cell_width//2.3
         self.number = number
@@ -21,6 +22,15 @@ class Enemy:
         self.target = None
         self.create_grid()
     
+    def reset(self):
+
+        self.grid_pos = vec(*self.initial_position)
+        self.pixel_pos = self.get_pixel_position() 
+        self.target = None
+        self.set_personality()
+
+
+
     def create_grid(self):
         grid = [[0 for j in range(28)] for i in range(30)]
 

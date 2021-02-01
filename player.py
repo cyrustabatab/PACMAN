@@ -7,15 +7,24 @@ class Player:
 
     def __init__(self,game,pos):
         self.game  = game
-        self.grid_pos = pos
+
+        self.initial_position = pos
+        self.grid_pos = vec(*pos)
         self.pix_pos = self.get_pixel_position()
         self.direction = vec(1,0)
         self.stored_direction = None
         self.able_to_move = True
         self.score = 0
         self.speed = 2
+        self.lives = 3
     
-
+    
+    def reset(self):
+        self.grid_pos = vec(*self.initial_position)
+        self.pix_pos = self.get_pixel_position()
+        self.direction = vec(1,0)
+        self.stored_direction = None
+        self.able_to_move = True
 
     def get_pixel_position(self):
         return vec(self.grid_pos.x * self.game.cell_width + TOP_BOTTOM_GAP//2 + self.game.cell_width//2,self.grid_pos.y * self.game.cell_height+ TOP_BOTTOM_GAP//2 +self.game.cell_height//2)
@@ -38,6 +47,8 @@ class Player:
 
     def draw(self):
         pygame.draw.circle(self.game.screen,PLAYER_COLOR,(int(self.pix_pos.x),int(self.pix_pos.y)),self.game.cell_width//2 -5)
+        for i in range(self.lives):
+            pygame.draw.circle(self.game.screen,PLAYER_COLOR,(20 * i + 30,HEIGHT - 15),7)
         pygame.draw.rect(self.game.screen,RED,(self.grid_pos[0] * self.game.cell_width + TOP_BOTTOM_GAP//2,self.grid_pos[1] * self.game.cell_height + TOP_BOTTOM_GAP//2,self.game.cell_width,self.game.cell_height),2)
     
 
