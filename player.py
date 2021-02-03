@@ -1,4 +1,4 @@
-import pygame
+import pygame,os
 from settings import *
 vec = pygame.math.Vector2
 
@@ -17,6 +17,7 @@ class Player:
         self.score = 0
         self.speed = 2
         self.lives = 3
+        self.chomp_sound = pygame.mixer.Sound(os.path.join('assets','pacman_chomp.wav'))
     
     
     def reset(self):
@@ -25,6 +26,10 @@ class Player:
         self.direction = vec(1,0)
         self.stored_direction = None
         self.able_to_move = True
+    
+    def overall_reset(self):
+        self.lives = 3
+        self.score = 0
 
     def get_pixel_position(self):
         return vec(self.grid_pos.x * self.game.cell_width + TOP_BOTTOM_GAP//2 + self.game.cell_width//2,self.grid_pos.y * self.game.cell_height+ TOP_BOTTOM_GAP//2 +self.game.cell_height//2)
@@ -43,6 +48,7 @@ class Player:
         self.grid_pos[0],self.grid_pos[1] = (self.pix_pos.x-TOP_BOTTOM_GAP//2)//self.game.cell_width,(self.pix_pos.y - TOP_BOTTOM_GAP)//self.game.cell_height + 1
 
         if self.on_coin():
+            #self.chomp_sound.play()
             self.eat_coin()
 
     def draw(self):

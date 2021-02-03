@@ -1,9 +1,9 @@
-import pygame,sys
+import pygame,sys,os
 from settings import *
 from player import Player
 from enemy import Enemy
 
-
+pygame.mixer.pre_init(44100,-16,2,512)
 pygame.init()
 
 
@@ -27,8 +27,15 @@ class Game:
         self.enemies = []
         self.enemy_positions = []
         self.load()
+        self.coin_count = len(self.coins)
         self.player = Player(self,self.player_position)
         self.make_enemies()
+        self.time = 0
+        self.death_sound = pygame.mixer.Sound(os.path.join('assets','pacman_death.wav'))
+        pygame.mixer.music.load(os.path.join('assets','pacman_beginning.wav'))
+        pygame.mixer.music.play(-1)
+
+
     
 
 
@@ -37,7 +44,10 @@ class Game:
 
     def run(self):
 
+        
 
+        self.second_event = pygame.USEREVENT + 1 
+        pygame.time.set_timer(self.second_event,1000)
         while self.running:
             if self.state == "menu":
                 self.menu_events()
@@ -51,6 +61,10 @@ class Game:
                 self.game_over_events()
                 self.game_over_update()
                 self.game_over_draw()
+            elif self.state == 'win':
+                self.game_over_events()
+                self.game_over_update()
+                self.win_draw()
 
             
 
@@ -92,7 +106,9 @@ class Game:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     self.state = 'playing'
+                    pygame.time.set_timer(self.second_event,1000)
                     self.new_high_score = False
+                    self.time = 0
 
 
 
@@ -101,6 +117,14 @@ class Game:
     def game_over_update(self):
         pass
 
+    
+
+    def win_draw(self):
+        self.screen.fill(BLACK)
+        self.draw_text(f"YOU WIN!",self.screen,[WIDTH//2,HEIGHT//2],18,RED,MENU_FONT,centered=True)
+        if self.new_high_score:
+            self.draw_text(f"NEW HIGH SCORE: {self.high_score}",self.screen,[WIDTH//2,HEIGHT//2 + 50],18,RED,MENU_FONT,centered=True)
+        pygame.display.update()
 
     def game_over_draw(self):
         self.screen.fill(BLACK)
@@ -125,6 +149,7 @@ class Game:
     
 
     def load(self):
+        
 
         with open('high_score.txt','r') as f:
             self.high_score = int(f.read())
@@ -170,17 +195,30 @@ class Game:
                 if event.key == pygame.K_DOWN:
                     self.player.move(vec(0,1))
 
-
+            if event.type == self.second_event:
+                self.time += 1
 
 
 
 
     def game_update(self):
         self.player.update()
+
         for enemy in self.enemies:
             enemy.update()
             if enemy.grid_pos == self.player.grid_pos:
+                self.death_sound.play()
                 self.remove_life()
+        
+         
+        if self.state != 'game over':
+            if self.player.score == self.coin_count:#self.coin_count:
+                pygame.time.set_timer(self.second_event,0)
+                if self.player.score > self.high_score:
+                    self.high_score = self.score
+                    self.new_high_score = True
+                self.player.overall_reset()
+                self.state = 'win'
 
         
 
@@ -193,6 +231,7 @@ class Game:
         topleft=(0,0)
         self.draw_text(f"CURRENT SCORE: {self.player.score}",self.screen,(60,1),18,WHITE,MENU_FONT)
         self.draw_text(f"HIGH SCORE: {self.high_score}",self.screen,(WIDTH//2 + 60,1),18,WHITE,MENU_FONT)
+        self.draw_text(f"{self.time:>4}",self.screen,(WIDTH - 60,HEIGHT - 25),18,WHITE,MENU_FONT)
         self.player.draw()
         for enemy in self.enemies:
             enemy.draw()
@@ -208,6 +247,7 @@ class Game:
                 self.running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
+                    pygame.mixer.music.stop()
                     self.state = 'playing'
     
 
@@ -230,6 +270,7 @@ class Game:
     def remove_life(self):
         self.player.lives -= 1
         if self.player.lives == 0:
+            pygame.time.set_timer(self.second_event,0)
             if self.player.score > self.high_score:
                 self.new_high_score = True
                 self.high_score = self.player.score
